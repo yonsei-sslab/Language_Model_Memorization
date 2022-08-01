@@ -3,7 +3,7 @@ CFG:
   # t5-small, t5-base, t5-large, t5-3b
   # t5-v1_1-small, t5-v1_1-base, t5-v1_1-large, t5-v1_1-xl
   # t5-small-lm-adapt, t5-base-lm-adapt, t5-large-lm-adapt, t5-xl-lm-adapt
-  model_type: gpt2 # gpt2, t5 flax-community/t5-base-openwebtext
+  model_type: gpt2 # gpt2, t5
 
   # configuration reconstructed according to the paper
   data_path: snoop2head/common_crawl # one of snoop2head/common_crawl, c4, openwebtext
@@ -18,6 +18,8 @@ CFG:
   # configuration for the model's generation
   device_ids: # if -1 use cpu(not recommended), elif 0 use single gpu, else use multiple gpus
     - 0
+    - 1
+    - 2
   fp16: false
   num_beams: 5
   repetition_penalty: 1.3

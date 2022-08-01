@@ -1,5 +1,8 @@
-# 3rd-party libraries
+# built-in libraries
+import os
 import multiprocessing
+
+# 3rd-party libraries
 import pandas as pd
 import numpy as np
 from tqdm import tqdm
@@ -7,7 +10,6 @@ from easydict import EasyDict
 import torch
 from torch.utils.data import DataLoader
 from datasets import load_dataset, dataset_dict
-
 
 # custom modules
 from models import load_tokenizer, load_generation_model, tokenize_fn
@@ -20,13 +22,6 @@ from utils import (
     collate_fn,
     seed_everything,
 )
-from metric import (
-    calculate_batch_perplexity,
-    calculate_batch_window,
-    calculate_batch_zlib,
-    Summary,
-    AverageMeter,
-)
 
 # load config
 CFG = load_config()
@@ -37,8 +32,6 @@ CPU_COUNT = multiprocessing.cpu_count() // 2
 devices = load_devices()
 tokenizer = load_tokenizer()
 baseline_model = load_generation_model("baseline").to(devices[0])  # largest model
-middle_model = load_generation_model("middle").to(devices[0])
-small_model = load_generation_model("small").to(devices[0])
 
 # load and tokenize dataset
 internet_data = load_dataset(CFG.data_path, split="train")
