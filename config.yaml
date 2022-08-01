@@ -1,0 +1,29 @@
+CFG:
+  # gpt2, gpt2-medium, gpt2-large, gpt2-xl
+  # t5-small, t5-base, t5-large, t5-3b
+  # t5-v1_1-small, t5-v1_1-base, t5-v1_1-large, t5-v1_1-xl
+  # t5-small-lm-adapt, t5-base-lm-adapt, t5-large-lm-adapt, t5-xl-lm-adapt
+  model_type: gpt2 # gpt2, t5 flax-community/t5-base-openwebtext
+
+  # configuration reconstructed according to the paper
+  data_path: snoop2head/common_crawl # one of snoop2head/common_crawl, c4, openwebtext
+  inference_batch_size: 32
+  min_prefix_length: 5 # prefix ranges 5 ~ 10 according to the paper
+  max_prefix_length: 10 
+  generate_token_length: 256 # +256 token to the given prefix
+  num_return_sequences: 5 # n = 40 (or k = 40)
+  num_inference_samples: 1000 # 200K sampling(or generation) per each scheme
+  
+
+  # configuration for the model's generation
+  device_ids: # if -1 use cpu(not recommended), elif 0 use single gpu, else use multiple gpus
+    - 0
+  fp16: false
+  num_beams: 5
+  repetition_penalty: 1.3
+  no_repeat_ngram_size: 3
+  num_return_sequences: 1
+
+  # other configs
+  seed: 42
+  inference_result_path: ./results/result.csv
