@@ -15,6 +15,7 @@
 
 - [ ] Supports T5 Encoder-Decoder as the victim model
 - [x] Prevents oversampling during the prefix selection
-- [ ] Speeds up with Multi-GPU parallel inference
+- [ ] Speeds up the inference with parallel Multi-GPU usage
+- [ ] Speeds up the reranking with parallel Multi-GPU usage
 - [x] Clears up GPU VRAM memory usage after the corresponding task
 - [x] Rules out 'low-quality repeated generations' with repetition penalty and with ngram restriction

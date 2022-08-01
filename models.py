@@ -36,6 +36,11 @@ def tokenize_fn(examples):
     return tokenizer(examples["text"], max_length=CFG.max_prefix_length, truncation=True)
 
 
+def encode_fn(examples):
+    tokenizer = load_tokenizer()
+    return tokenizer(examples["generated"])
+
+
 def load_generation_model(model_size):
     if CFG.model_type.lower() in seq2seq_candidates:
         model_name = T5_DICT[model_size]
@@ -46,3 +51,4 @@ def load_generation_model(model_size):
         model.config.pad_token_id = model.config.eos_token_id
     print("loaded", model.__class__.__name__, model_name, "model")
     return model
+

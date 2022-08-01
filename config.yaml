@@ -7,15 +7,17 @@ CFG:
 
   # configuration reconstructed according to the paper
   data_path: snoop2head/common_crawl # one of snoop2head/common_crawl, c4, openwebtext
-  inference_batch_size: 32
   min_prefix_length: 5 # prefix ranges 5 ~ 10 according to the paper
   max_prefix_length: 10 
   generate_token_length: 256 # +256 token to the given prefix
   num_return_sequences: 5 # n = 40 (or k = 40)
   num_inference_samples: 1000 # 200K sampling(or generation) per each scheme
+  window_size: 50
   
 
-  # configuration for the model's generation
+  # configuration for the model's inference / reranking
+  inference_batch_size: 32
+  rerank_batch_size: 1
   device_ids: # if -1 use cpu(not recommended), elif 0 use single gpu, else use multiple gpus
     - 0
     - 1
@@ -28,4 +30,4 @@ CFG:
 
   # other configs
   seed: 42
-  inference_result_path: ./results/result.csv
+  inference_result_path: ./results/generation_result.csv
