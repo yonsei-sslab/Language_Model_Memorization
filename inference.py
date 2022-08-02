@@ -80,7 +80,7 @@ for prefix_loader in list_prefix_loaders:
                 input_ids=prefix_batch,
                 attention_mask=attention_mask,
                 max_length=CFG.max_prefix_length + CFG.generate_token_length,
-                num_return_sequences=CFG.num_return_sequences,
+                top_k=CFG.top_n,
                 repetition_penalty=CFG.repetition_penalty,
                 no_repeat_ngram_size=CFG.no_repeat_ngram_size,
             )
@@ -104,4 +104,5 @@ for prefix_loader in list_prefix_loaders:
     )
 
 df = pd.DataFrame({"prefix": list_prefix_texts, "generated": list_generated_texts})
+df = df.drop_duplicates(subset="generated", keep="first")  # deduplicate generations
 df.to_csv(CFG.inference_result_path, index=False)
