@@ -10,6 +10,7 @@ from easydict import EasyDict
 import torch
 from torch.utils.data import DataLoader
 from datasets import load_dataset, dataset_dict
+from transformers import AutoModelForSeq2SeqLM, AutoModelForCausalLM
 from parallelformers import parallelize
 
 
@@ -34,8 +35,11 @@ if __name__ == "__main__":
     # load models to the designated device(s)
     devices = load_devices()
     tokenizer = load_tokenizer()
-    baseline_model = load_generation_model("small")  # largest model
-    parallelize(baseline_model, num_gpus=2, fp16=CFG.fp16, verbose="simple")
+    # baseline_model = load_generation_model("baseline")  # largest model gpt2-xl not working
+    baseline_model = AutoModelForCausalLM.from_pretrained("gpt2-large")
+
+    # make sure to designate even number of gpus: https://github.com/tunib-ai/parallelformers/issues/4#issuecomment-882510549
+    parallelize(baseline_model, num_gpus=2, fp16=False, verbose="simple")
 
     # load and tokenize dataset
     internet_data = load_dataset(CFG.data_path, split="train")
