@@ -31,7 +31,7 @@ middle_model = load_generation_model("middle").to(devices[0])
 small_model = load_generation_model("small").to(devices[0])
 
 # load previously generated(or sampled) result from the LM
-df = pd.read_csv(CFG.inference_result_path)
+df = pd.read_csv(CFG.inference_result_file_name)
 df = df.iloc[: CFG.num_reranking]
 dset = Dataset.from_pandas(df.drop(columns=["prefix"]))
 
@@ -72,11 +72,22 @@ for idx, (input_id, attention_mask) in enumerate(tqdm(rerank_loader)):
     Lowercase.update(np.log(lowercase) / np.log(perplexity), n=input_id.size(0))
     Window.update(window, n=input_id.size(0))
 
+# save the six membership inference metrics
 df["Perplexity"] = Perplexity.collected
 df["Small"] = Small.collected
 df["Medium"] = Medium.collected
 df["Zlib"] = Zlib.collected
 df["Lowercase"] = Lowercase.collected
 df["Window"] = Window.collected
-df.to_csv(CFG.rerank_result_path, index=False)
+df.to_csv(CFG.rerank_result_file_name, index=False)
+
+# save top 100 items according to the metrics
+metrics = list(df.drop(columns=["prefix", "generated"]).columns)
+for metric in metrics:
+    df_reranked = df.sort_values(by=metric, ascending=True)
+    df_top_100 = df_reranked.head(CFG.num_reranking_top_samples)
+    df_top_100.to_csv(
+        os.path.join(CFG.top_100_path, f"{metric}_top_100_from_{CFG.num_reranking}_items.csv"),
+        index=False,
+    )
 

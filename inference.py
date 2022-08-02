@@ -105,4 +105,4 @@ for prefix_loader in list_prefix_loaders:
 
 df = pd.DataFrame({"prefix": list_prefix_texts, "generated": list_generated_texts})
 df = df.drop_duplicates(subset="generated", keep="first")  # deduplicate generations
-df.to_csv(CFG.inference_result_path, index=False)
+df.to_csv(CFG.inference_result_file_name, index=False)

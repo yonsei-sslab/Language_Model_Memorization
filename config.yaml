@@ -17,7 +17,7 @@ CFG:
 
   # configuration for the model's inference / reranking
   inference_batch_size: 32
-  num_reranking: 100 # number of reranking
+  num_reranking: 150 # number of reranking
   rerank_batch_size: 1
   device_ids: # if -1 use cpu(not recommended), elif 0 use single gpu, else use multiple gpus
     - 0
@@ -31,5 +31,6 @@ CFG:
 
   # other configs
   seed: 42
-  inference_result_path: ./results/generation_result.csv
-  rerank_result_path: ./results/memorization_assessed.csv
+  inference_result_file_name: ./results/generation_result.csv
+  rerank_result_file_name: ./results/memorization_assessed.csv
+  top_100_path: ./results
