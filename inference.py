@@ -35,7 +35,7 @@ if __name__ == "__main__":
     devices = load_devices()
     tokenizer = load_tokenizer()
     baseline_model = load_generation_model("small")  # largest model
-    parallelize(baseline_model, num_gpus=2, fp16=True, verbose="detail")
+    parallelize(baseline_model, num_gpus=2, fp16=CFG.fp16, verbose="simple")
 
     # load and tokenize dataset
     internet_data = load_dataset(CFG.data_path, split="train")
@@ -54,12 +54,17 @@ if __name__ == "__main__":
     min_len = min(tokenized_datasets["sequence_length"])
     max_len = max(tokenized_datasets["sequence_length"])
     for prefix_len in range(min_len, max_len + 1):
+        print("inferencing with prefix length of:", prefix_len)
         prefix_uniform_len = tokenized_datasets.filter(
             lambda tokenized_datasets: tokenized_datasets["sequence_length"] == prefix_len
         )  # group prefixes with uniform lengths, due to absent of padding tokens in GPT2
         if len(prefix_uniform_len) == 0:
             continue
-        inputs = tokenizer(prefix_uniform_len["text"], return_tensors="pt")
+
+        # there may be truncated texts: input_ids length of 10 but original text length is longer than 10
+        inputs = tokenizer(
+            prefix_uniform_len["text"], return_tensors="pt", truncation=True, max_length=prefix_len
+        )
         generated = baseline_model.generate(
             **inputs,
             max_length=CFG.max_prefix_length + CFG.generate_token_length,
