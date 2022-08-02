@@ -2,9 +2,9 @@
 
 ### How to Run
 
-- (Optional) Change model type and hyperparameters at `config.yaml`
-- Run `python inference.py` for text sampling from the victim language model
-- Run `python rerank.py` to retrieve possibly memorized text sequence candidates
+1. (Optional) Change model type and hyperparameters at `config.yaml`
+2. Run `python inference.py` for text sampling from the victim language model
+3. Run `python rerank.py` to retrieve possibly memorized text sequence candidates
 
 ### References
 

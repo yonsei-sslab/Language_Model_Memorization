@@ -4,6 +4,7 @@ import random
 import torch
 from easydict import EasyDict
 import yaml
+from transformers.generation_logits_process import LogitsProcessor
 
 
 def load_config(config_path="./config.yaml"):
@@ -80,3 +81,27 @@ def collate_fn(batch):
         torch.tensor([item["attention_mask"] for item in batch], dtype=torch.long),
     )
 
+
+class DecayingTemperatureWarper(LogitsProcessor):
+    """
+    Written by @shreyansh26 at https://github.com/shreyansh26/Extracting-Training-Data-from-Large-Langauge-Models/blob/main/extraction_temperature_decay.py
+    - Custom LogitProcessor to decay Temperature from 10.0 to 1.0 over the first 20 tokens
+    - Assign 1.0 for subsequent tokens after the 20th token
+    """
+
+    def __init__(self, temperature: float):
+        if not isinstance(temperature, float) or not (temperature > 0):
+            raise ValueError(
+                f"`temperature` has to be a strictly positive float, but is {temperature}"
+            )
+
+        self.temperature = temperature
+        # make dictionary from 0 to 20 as keys
+        # from 10 to 1 as values
+        self.temperature_dict = {i: 10.0 - 9.0 * (i / 20) for i in range(21)}
+
+    def __call__(self, input_ids: torch.Tensor, scores: torch.Tensor) -> torch.FloatTensor:
+        cur_len = input_ids.shape[-1]
+        self.temperature = self.temperature_dict.get(cur_len, 1.0)
+
+        return scores
