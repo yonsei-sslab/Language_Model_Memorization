@@ -14,8 +14,7 @@ from metric import (
     calculate_individual_lower,
     calculate_individual_window,
     calculate_individual_zlib,
-    Summary,
-    AverageMeter,
+    Metric,
 )
 from utils import load_config, load_devices, seed_everything, collate_fn
 
@@ -33,8 +32,8 @@ small_model = load_generation_model("small").to(devices[0])
 
 # load previously generated(or sampled) result from the LM
 df = pd.read_csv(CFG.inference_result_path)
-df = df.drop(columns=["prefix"])
-dset = Dataset.from_pandas(df)
+df = df.iloc[: CFG.num_reranking]
+dset = Dataset.from_pandas(df.drop(columns=["prefix"]))
 
 # tokenize dset
 tokenized_dset = dset.map(encode_fn, batched=True, num_proc=CPU_COUNT, remove_columns=["generated"])
@@ -44,12 +43,12 @@ rerank_loader = DataLoader(
 
 # initialize six membership inference metrics
 Perplexity, Small, Medium, Zlib, Lowercase, Window = (
-    AverageMeter("Perplexity", ":6.3f"),
-    AverageMeter("Small", ":6.3f"),
-    AverageMeter("Medium", ":6.3f"),
-    AverageMeter("Zlib", ":6.3f"),
-    AverageMeter("Lowercase", ":6.3f"),
-    AverageMeter("Window", ":6.3f"),
+    Metric("Perplexity"),
+    Metric("Small"),
+    Metric("Medium"),
+    Metric("Zlib"),
+    Metric("Lowercase"),
+    Metric("Window"),
 )
 
 # tokenize previously sampled dataset
@@ -57,7 +56,7 @@ for idx, (input_id, attention_mask) in enumerate(tqdm(rerank_loader)):
     # load input_id to the device
     input_id = input_id.to(devices[0])
 
-    # yield metrics per batch
+    # base measures per batch / per item
     perplexity = calculate_individual_perplexity(input_id, baseline_model)
     small = calculate_individual_perplexity(input_id, small_model)
     medium = calculate_individual_perplexity(input_id, middle_model)
@@ -65,11 +64,19 @@ for idx, (input_id, attention_mask) in enumerate(tqdm(rerank_loader)):
     lowercase = calculate_individual_lower(input_id, baseline_model, tokenizer, devices[0])
     window = calculate_individual_window(input_id, baseline_model, window_size=CFG.window_size)
 
-    # update metrics accross batches
+    # compose metrics based on the given measures accross batches
     Perplexity.update(perplexity, n=input_id.size(0))
-    Small.update(small, n=input_id.size(0))
-    Medium.update(medium, n=input_id.size(0))
-    Zlib.update(zlib, n=input_id.size(0))
-    Lowercase.update(lowercase, n=input_id.size(0))
+    Small.update(np.log(small) / np.log(perplexity), n=input_id.size(0))
+    Medium.update(np.log(medium) / np.log(perplexity), n=input_id.size(0))
+    Zlib.update(zlib / np.log(perplexity), n=input_id.size(0))
+    Lowercase.update(np.log(lowercase) / np.log(perplexity), n=input_id.size(0))
     Window.update(window, n=input_id.size(0))
+
+df["Perplexity"] = Perplexity.collected
+df["Small"] = Small.collected
+df["Medium"] = Medium.collected
+df["Zlib"] = Zlib.collected
+df["Lowercase"] = Lowercase.collected
+df["Window"] = Window.collected
+df.to_csv(CFG.rerank_result_path, index=False)
 

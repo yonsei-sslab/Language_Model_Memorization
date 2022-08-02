@@ -11,7 +11,7 @@ def calculate_individual_perplexity(input_ids, model):
         output = model(input_ids, labels=input_ids)
     perplexity = torch.exp(output.loss)
     del output, input_ids
-    return perplexity.cpu().detach().numpy()
+    return float(perplexity.cpu().detach().numpy())
 
 
 def calculate_individual_lower(input_ids, model, tokenizer, device):
@@ -52,7 +52,7 @@ def calculate_individual_window(input_ids, model, window_size=50):
         for tensor in sliding_windows:
             perplexity = calculate_individual_perplexity(tensor, model)
             del tensor
-            min_perplexity = min(min_perplexity, perplexity.sum())
+            min_perplexity = min(min_perplexity, perplexity)
 
     del input_ids
     return min_perplexity
@@ -71,7 +71,7 @@ def calculate_individual_zlib(input_ids, tokenizer):
         input_ids = input_ids.squeeze()
     text = "".join(tokenizer.decode(input_ids.cpu().detach().numpy()))
     text = text.lower()
-    return len(zlib.compress(bytes(text, "utf-8")))
+    return float(len(zlib.compress(bytes(text, "utf-8"))))
 
 
 class Summary(Enum):
@@ -81,10 +81,10 @@ class Summary(Enum):
     COUNT = 3
 
 
-class AverageMeter(object):
+class Metric(object):
     """Computes and stores the average accross the given batches"""
 
-    def __init__(self, name, fmt=":f", summary_type=Summary.AVERAGE):
+    def __init__(self, name, fmt=":6.3f", summary_type=Summary.AVERAGE):
         self.name = name
         self.fmt = fmt
         self.summary_type = summary_type
@@ -92,12 +92,18 @@ class AverageMeter(object):
 
     def reset(self):
         self.val = 0
+        self.collected = np.array([])
         self.avg = 0
         self.sum = 0
         self.count = 0
 
     def update(self, val, n=1):
         self.val = val
+        self.collected = (
+            np.concatenate(self.collected, self.val)
+            if type(self.val) == np.ndarray or type(self.val) == list
+            else np.append(self.collected, self.val)
+        )
         self.sum += val * n
         self.count += n
         self.avg = self.sum / self.count
