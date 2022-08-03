@@ -3,9 +3,6 @@ runs
 wandb
 _clones
 logs
-ke-t5-base-finetuned-en-to-ko
-ke-t5-base-finetuned-ko-to-en
 *.wet
-*.txt
 *.ipynb
 .python-version

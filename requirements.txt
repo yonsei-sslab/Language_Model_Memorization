@@ -1,0 +1,4 @@
+torch==1.7.0+cu101
+transformers==4.4.1
+sentencepiece==0.1.96
+parallelformers==1.0.1
