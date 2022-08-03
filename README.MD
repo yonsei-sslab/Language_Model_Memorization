@@ -4,6 +4,7 @@
 
 1. (Optional) Change model type and hyperparameters at `config.yaml`
 2. Run `python inference.py` for text sampling from the victim language model
+   (Optional) Run `python parallel_inference.py` for faster generation from the victim language model.
 3. Run `python rerank.py` to retrieve possibly memorized text sequence candidates
 
 ### References
