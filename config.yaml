@@ -10,24 +10,22 @@ CFG:
   min_prefix_length: 5 # prefix ranges 5 ~ 10 according to the paper
   max_prefix_length: 10 # prefix ranges 5 ~ 10 according to the paper
   generate_token_length: 256 # +256 token to the given prefix
-  top_n: 5 # n = 40 (or k = 40)
-  num_inference_samples: 1000 # 200K sampling(or generation) per each scheme
+  top_n: 40 # n = 40 (or k = 40)
+  num_queries: 100
+  num_return_sequences: 1 # 200K sampling(or generation) per each scheme
   num_reranking_top_samples: 100 # reranking top 100 items x 3 generation methods x 6 metrics
   window_size: 50
 
   # configuration for the model's inference / reranking
-  inference_batch_size: 32
+  inference_batch_size: 40
   num_reranking: 150 # number of reranking
   rerank_batch_size: 1
   device_ids: # if -1 use cpu(not recommended), elif 0 use single gpu, else use multiple gpus
     - 0
-    - 1
-    - 2
   fp16: false
   num_beams: 5
   repetition_penalty: 1.3
   no_repeat_ngram_size: 3
-  num_return_sequences: 1
 
   # other configs
   seed: 42

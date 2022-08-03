@@ -37,7 +37,7 @@ baseline_model = load_generation_model("baseline").to(devices[0])  # largest mod
 internet_data = load_dataset(CFG.data_path, split="train")
 internet_data = internet_data.filter(remove_lengthy_texts, num_proc=CPU_COUNT)
 random_numbers_train = np.random.randint(
-    0, len(internet_data["text"]), int(CFG.num_inference_samples)
+    0, len(internet_data["text"]), int(CFG.num_queries)
 )
 internet_data = internet_data.select(random_numbers_train)
 tokenized_datasets = internet_data.map(
@@ -83,6 +83,7 @@ for prefix_loader in list_prefix_loaders:
                 top_k=CFG.top_n,
                 repetition_penalty=CFG.repetition_penalty,
                 no_repeat_ngram_size=CFG.no_repeat_ngram_size,
+                num_return_sequences=CFG.num_return_sequences
             )
             del attention_mask
 
@@ -100,7 +101,7 @@ for prefix_loader in list_prefix_loaders:
             list_prefix_texts.extend(prefix_texts)
             list_generated_texts.extend(generated_texts)
     print(
-        f"generation/sampling completed | {prefix_length} prefix length | {idx+1 * CFG.inference_batch_size} samples"
+        f"generation/sampling completed | {prefix_length} prefix length | {len(generated_texts)} samples"
     )
 
 df = pd.DataFrame({"prefix": list_prefix_texts, "generated": list_generated_texts})
