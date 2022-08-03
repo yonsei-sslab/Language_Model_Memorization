@@ -9,7 +9,7 @@ from tqdm import tqdm
 from easydict import EasyDict
 import torch
 from torch.utils.data import DataLoader
-from datasets import load_dataset, dataset_dict
+from datasets import load_dataset, dataset_dict, Dataset
 
 # custom modules
 from models import load_tokenizer, load_generation_model, tokenize_fn
@@ -107,3 +107,6 @@ for prefix_loader in list_prefix_loaders:
     df = pd.DataFrame({"prefix": list_prefix_texts, "generated": list_generated_texts})
     df = df.drop_duplicates(subset="generated", keep="first")  # deduplicate generations
     df.to_csv(CFG.inference_result_file_name, index=False)
+
+gen_dset = Dataset.from_pandas(df)
+gen_dset.push_to_hub("snoop2head/commoncrawl_gpt2-xl_gen_200K")
