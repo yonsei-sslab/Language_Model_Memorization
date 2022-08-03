@@ -101,9 +101,9 @@ for prefix_loader in list_prefix_loaders:
             list_prefix_texts.extend(prefix_texts)
             list_generated_texts.extend(generated_texts)
     print(
-        f"generation/sampling completed | {prefix_length} prefix length | {len(generated_texts)} samples"
+        f"generation/sampling completed | {prefix_length} prefix length | collected {len(list_generated_texts)} samples so far"
     )
 
-df = pd.DataFrame({"prefix": list_prefix_texts, "generated": list_generated_texts})
-df = df.drop_duplicates(subset="generated", keep="first")  # deduplicate generations
-df.to_csv(CFG.inference_result_file_name, index=False)
+    df = pd.DataFrame({"prefix": list_prefix_texts, "generated": list_generated_texts})
+    df = df.drop_duplicates(subset="generated", keep="first")  # deduplicate generations
+    df.to_csv(CFG.inference_result_file_name, index=False)

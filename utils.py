@@ -7,7 +7,7 @@ import yaml
 from transformers.generation_logits_process import LogitsProcessor
 
 
-def load_config(config_path="./config.yaml"):
+def load_config(config_path="/content/Attacking_Language_Model/config.yaml"):
     # Read config.yaml file
     with open(config_path) as infile:
         SAVED_CFG = yaml.load(infile, Loader=yaml.FullLoader)

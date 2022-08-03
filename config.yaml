@@ -11,8 +11,8 @@ CFG:
   max_prefix_length: 10 # prefix ranges 5 ~ 10 according to the paper
   generate_token_length: 256 # +256 token to the given prefix
   top_n: 40 # n = 40 (or k = 40)
-  num_queries: 100
-  num_return_sequences: 1 # 200K sampling(or generation) per each scheme
+  num_queries: 20000 # 200K sampling(or generation) per each scheme
+  num_return_sequences: 1 
   num_reranking_top_samples: 100 # reranking top 100 items x 3 generation methods x 6 metrics
   window_size: 50
 
