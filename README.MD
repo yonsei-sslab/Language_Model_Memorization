@@ -3,8 +3,9 @@
 ### How to Run
 
 1. (Optional) Change model type and hyperparameters at `config.yaml`
-2. Run `python inference.py` for text sampling from the victim language model
-   (Optional) Run `python parallel_inference.py` for faster generation from the victim language model.
+2. Text sampling from the victim language model
+   - Run `python inference.py` for single-gpu generation from the victim language model.
+   - Run `python parallel_inference.py` for faster generation from the victim language model.
 3. Run `python rerank.py` to retrieve possibly memorized text sequence candidates
 
 ### References
