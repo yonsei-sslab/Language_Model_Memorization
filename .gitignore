@@ -6,3 +6,4 @@ logs
 *.wet
 *.ipynb
 .python-version
+./results/memorization_assessed.csv
